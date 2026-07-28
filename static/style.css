@@ -1,0 +1,62 @@
+h1
+{
+    color: darkblue;
+}
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background:#f5f7fa;
+    margin:40px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    box-shadow:0 3px 12px rgba(0,0,0,.1);
+}
+
+th{
+    background:#2f4050;
+    color:white;
+    padding:14px;
+    text-align:left;
+}
+
+td{
+    padding:12px 14px;
+    border-bottom:1px solid #e6e6e6;
+}
+
+tr:hover{
+    background:#f8f8f8;
+}
+
+.deleteButton{
+    background:#d9534f;
+    color:white;
+    border:none;
+    border-radius:5px;
+    padding:8px 10px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+.deleteButton:hover{
+    background:#c9302c;
+}
+
+.actionCell{
+    text-align:center;
+    width:70px;
+}
+
+.expired-yellow {
+    background-color: #fff3a0;
+}
+
+.expired-red {
+    background-color: #ff9d9d;
+}
+
+</style>

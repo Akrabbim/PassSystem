@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SciHigh Passes</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+		  
+</head>
+
+<body>
+
+	<a href="{{ url_for('logout') }}">Logout ({{ username }})</a>
+	
+	<h2>
+		Welcome, {{ username }}
+	</h2>
+	<form method="POST" action="/add_pass" class="passForm">
+
+		<h2>Create New Pass</h2>
+
+		<label for="studentName">Student Name</label>
+		<input 
+			type="text" 
+			id="studentName" 
+			name="studentName" 
+			required>
+
+		<br><br>
+
+		<label for="destination">Destination</label>
+		<select 
+			id="destination" 
+			name="destination"
+			onchange="toggleOtherField()"
+			required>
+
+			<option value="">-- Select Destination --</option>
+			<option value="Bathroom">Bathroom</option>
+			<option value="Nurse">Nurse</option>
+			<option value="Front Office">Front Office</option>
+			<option value="Student Services">Front Office</option>
+			<option value="Academic Counselor">Front Office</option>
+			<option value="Other">Other</option>
+
+		</select>
+
+		<br><br>
+
+		<label for="otherDestination">Other</label>
+		<input 
+			type="text"
+			id="otherDestination"
+			name="otherDestination"
+			disabled>
+
+		<br><br>
+
+		<button type="submit">
+			Create Pass
+		</button>
+
+	</form>
+
+
+	<script>
+	function toggleOtherField() {
+
+		const destination = document.getElementById("destination");
+		const otherField = document.getElementById("otherDestination");
+
+		if (destination.value === "Other") {
+			otherField.disabled = false;
+			otherField.required = true;
+		}
+		else {
+			otherField.disabled = true;
+			otherField.required = false;
+			otherField.value = "";
+		}
+	}
+	</script>
+	
+	<table>
+
+		<thead>
+		<tr>
+			<th>Student</th>
+			<th>Destination</th>
+			<th>Date</th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>
+
+		{% for record in dataSet %}
+
+			<tr data-created="{{ record.CreateDate.isoformat() }}"
+			class="
+			{% set age = (now - record.CreateDate).total_seconds() %}
+			{% if age >= 720 %}
+				expired-red
+			{% elif age >= 420 %}
+				expired-yellow
+			{% endif %}
+			">
+				<td>{{ record.StudentName }}</td>
+				<td>{{ record.Destination }}</td>
+				<td>{{ record.CreateDate.strftime("%m/%d/%Y %I:%M %p") }}</td>
+				<td>
+					<form method="POST" action="{{ url_for('delete', id=record.id, next='home') }}">
+						<input type="hidden" name="id" value="{{ record['id'] }}">
+
+						<button type="submit" class="deleteButton" onclick="return confirm('Delete this pass?');">
+							🗑️
+						</button>
+					</form>
+				</td>
+			</tr>
+
+		{% endfor %}
+
+		</tbody>
+	</table>
+
+</body>
+<script>
+	function updateRowColors() {
+		const rows = document.querySelectorAll("tbody tr");
+
+		rows.forEach(row => {
+			const created = new Date(row.dataset.created);
+			const now = new Date();
+
+			const ageMinutes = (now - created) / 60000;
+
+			row.classList.remove("expired-yellow", "expired-red");
+
+			if (ageMinutes >= 12) {
+				row.classList.add("expired-red");
+			}
+			else if (ageMinutes >= 7) {
+				row.classList.add("expired-yellow");
+			}
+		});
+	}
+
+	updateRowColors();
+	setInterval(updateRowColors, 30000); // Update every 30 seconds
+</script>
+</html>

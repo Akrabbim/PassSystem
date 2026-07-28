@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SciHigh Pass Monitor</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+		  
+</head>
+
+<body>
+
+	<a href="{{ url_for('logout') }}">Logout ({{ username }})</a>
+	
+	<h2>
+		Welcome, {{ username }}
+	</h2>
+	
+	<table>
+
+		<thead>
+		<tr>
+			<th>Teacher</th>
+			<th>Student</th>
+			<th>Destination</th>
+			<th>Date</th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>
+
+		{% for record in dataSet %}
+
+			<tr data-created="{{ record.CreateDate.isoformat() }}"
+			class="
+			{% set age = (now - record.CreateDate).total_seconds() %}
+			{% if age >= 720 %}
+				expired-red
+			{% elif age >= 420 %}
+				expired-yellow
+			{% endif %}
+			">
+				<td>{{ record.TeacherName }}</td>
+				<td>{{ record.StudentName }}</td>
+				<td>{{ record.Destination }}</td>
+				<td>{{ record.CreateDate.strftime("%m/%d/%Y %I:%M %p") }}</td>
+				<td>
+					<form method="POST" action="{{ url_for('delete', id=record.id, next='monitor') }}">
+						<input type="hidden" name="id" value="{{ record['id'] }}">
+
+						<button type="submit" class="deleteButton" onclick="return confirm('Delete this pass?');">
+							🗑️
+						</button>
+					</form>
+				</td>
+			</tr>
+
+		{% endfor %}
+
+		</tbody>
+	</table>
+
+</body>
+<script>
+	function updateRowColors() {
+		const rows = document.querySelectorAll("tbody tr");
+
+		rows.forEach(row => {
+			const created = new Date(row.dataset.created);
+			const now = new Date();
+
+			const ageMinutes = (now - created) / 60000;
+
+			row.classList.remove("expired-yellow", "expired-red");
+
+			if (ageMinutes >= 12) {
+				row.classList.add("expired-red");
+			}
+			else if (ageMinutes >= 7) {
+				row.classList.add("expired-yellow");
+			}
+		});
+	}
+
+	updateRowColors();
+	setInterval(updateRowColors, 30000); // Update every 30 seconds
+</script>
+</html>
