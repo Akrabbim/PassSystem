@@ -79,6 +79,7 @@ def home():
         title="Welcome", 
         username=session["user"]["name"],
         dataSet=GetMyRecords(),
+        fullSet=GetRecords(),
         now=datetime.now()
     )
 

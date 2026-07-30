@@ -9,12 +9,16 @@
 </head>
 
 <body>
-
-	<a href="{{ url_for('logout') }}">Logout ({{ username }})</a>
 	
-	<h2>
-		Welcome, {{ username }}
-	</h2>
+	<br />
+	<br />
+	<div class="user-menu">
+		<span class="username">{{ username }}</span>
+		<a href="{{ url_for('logout') }}" class="logout-button">
+			<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+			Logout
+		</a>
+	</div>
 	
 	<table>
 

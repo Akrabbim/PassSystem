@@ -10,76 +10,66 @@
 
 <body>
 
-	<a href="{{ url_for('logout') }}">Logout ({{ username }})</a>
+	<div class="user-menu">
+		<span class="username">{{ username }}</span>
+		<a href="{{ url_for('logout') }}" class="logout-button">
+			<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+			Logout
+		</a>
+	</div>
 	
-	<h2>
-		Welcome, {{ username }}
-	</h2>
 	<form method="POST" action="/add_pass" class="passForm">
 
 		<h2>Create New Pass</h2>
 
-		<label for="studentName">Student Name</label>
-		<input 
-			type="text" 
-			id="studentName" 
-			name="studentName" 
-			required>
+		<div class="form-row">
+			<label for="studentName">Student Name</label>
+			<input 
+				type="text" 
+				id="studentName" 
+				name="studentName" 
+				required
+				autofocus>
+		</div>
 
-		<br><br>
+		<div class="form-row">
+			<label for="destination">Destination</label>
+			<select 
+				id="destination" 
+				name="destination"
+				onchange="toggleOtherField()"
+				required>
 
-		<label for="destination">Destination</label>
-		<select 
-			id="destination" 
-			name="destination"
-			onchange="toggleOtherField()"
-			required>
+				<option value="">-- Select Destination --</option>
+				<option value="Bathroom">Bathroom</option>
+				<option value="Nurse">Nurse</option>
+				<option value="Front Office">Front Office</option>
+				<option value="Student Services">Student Services</option>
+				<option value="Academic Counselor">Academic Counselor</option>
+				<option value="Other">Other</option>
 
-			<option value="">-- Select Destination --</option>
-			<option value="Bathroom">Bathroom</option>
-			<option value="Nurse">Nurse</option>
-			<option value="Front Office">Front Office</option>
-			<option value="Student Services">Front Office</option>
-			<option value="Academic Counselor">Front Office</option>
-			<option value="Other">Other</option>
+			</select>
+		</div>
 
-		</select>
+		<div class="form-row">
+			<label for="otherDestination">Other</label>
+			<input 
+				type="text"
+				id="otherDestination"
+				name="otherDestination"
+				disabled>
+		</div>
 
-		<br><br>
-
-		<label for="otherDestination">Other</label>
-		<input 
-			type="text"
-			id="otherDestination"
-			name="otherDestination"
-			disabled>
-
-		<br><br>
-
-		<button type="submit">
-			Create Pass
-		</button>
+		<div class="submit-row">
+			<button type="submit">
+				Create Pass
+			</button>
+		</div>
 
 	</form>
-
-
-	<script>
-	function toggleOtherField() {
-
-		const destination = document.getElementById("destination");
-		const otherField = document.getElementById("otherDestination");
-
-		if (destination.value === "Other") {
-			otherField.disabled = false;
-			otherField.required = true;
-		}
-		else {
-			otherField.disabled = true;
-			otherField.required = false;
-			otherField.value = "";
-		}
-	}
-	</script>
+	
+	<br />
+	<br />
 	
 	<table>
 
@@ -122,6 +112,62 @@
 
 		</tbody>
 	</table>
+	
+	<br />
+	<br />
+	
+	<table>
+
+		<thead>
+		<tr>
+			<th>Teacher</th>
+			<th>Student</th>
+			<th>Destination</th>
+			<th>Date</th>
+		</tr>
+		</thead>
+		<tbody>
+
+		{% for record in fullSet %}
+
+			<tr data-created="{{ record.CreateDate.isoformat() }}"
+			class="
+			{% set age = (now - record.CreateDate).total_seconds() %}
+			{% if age >= 720 %}
+				expired-red
+			{% elif age >= 420 %}
+				expired-yellow
+			{% endif %}
+			">
+				<td>{{ record.TeacherName }}</td>
+				<td>{{ record.StudentName }}</td>
+				<td>{{ record.Destination }}</td>
+				<td>{{ record.CreateDate.strftime("%m/%d/%Y %I:%M %p") }}</td>
+			</tr>
+
+		{% endfor %}
+
+		</tbody>
+	</table>
+
+
+	<script>
+	function toggleOtherField() {
+
+		const destination = document.getElementById("destination");
+		const otherField = document.getElementById("otherDestination");
+
+		if (destination.value === "Other") {
+			otherField.disabled = false;
+			otherField.required = true;
+		}
+		else {
+			otherField.disabled = true;
+			otherField.required = false;
+			otherField.value = "";
+		}
+	}
+	</script>
 
 </body>
 <script>
