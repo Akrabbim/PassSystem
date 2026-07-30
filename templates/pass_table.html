@@ -1,0 +1,36 @@
+<table>
+    <thead>
+        <tr>
+			{% if show_teacher %}
+            <th>Teacher</th>
+            {% endif %}
+            <th>Student</th>
+            <th>Destination</th>
+            <th>Created</th>
+            {% if show_delete %}
+            <th></th>
+            {% endif %}
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for pass in passes %}
+        <tr class="{{ pass.color }}" data-created="{{ pass.CreateDate.isoformat() }}">
+			{% if show_teacher %}
+            <td>{{ pass.TeacherName }}</td>
+            {% endif %}
+            <td>{{ pass.StudentName }}</td>
+            <td>{{ pass.Destination }}</td>
+            <td>{{ pass.CreateDate.strftime("%m/%d/%Y %I:%M %p") }}</td>
+
+            {% if show_delete %}
+            <td>
+                <form method="POST" action="/delete/{{ pass.id }}">
+                    <button type="submit" class="deleteButton" onclick="return confirm('Delete this pass?');">🗑️</button>
+                </form>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

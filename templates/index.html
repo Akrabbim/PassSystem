@@ -1,197 +1,155 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>SciHigh Passes</title>
+	<head>
+		<title>SciHigh Passes</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-		  
-</head>
+		<link rel="stylesheet"
+			  href="{{ url_for('static', filename='style.css') }}">
+			  
+	</head>
 
-<body>
+	<body>
 
-	<div class="user-menu">
-		<span class="username">{{ username }}</span>
-		<a href="{{ url_for('logout') }}" class="logout-button">
-			<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-			Logout
-		</a>
-	</div>
-	
-	<form method="POST" action="/add_pass" class="passForm">
+		<div class="user-menu">
+			<span class="username">{{ username }}</span>
+			<a href="{{ url_for('logout') }}" class="logout-button">
+				<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+				Logout
+			</a>
+		</div>
+		
+		<form method="POST" action="/add_pass" class="passForm">
 
-		<h2>Create New Pass</h2>
+			<h2>Create New Pass</h2>
 
-		<div class="form-row">
-			<label for="studentName">Student Name</label>
-			<input 
-				type="text" 
-				id="studentName" 
-				name="studentName" 
-				required
-				autofocus>
+			<div class="form-row">
+				<label for="studentName">Student Name</label>
+				<input 
+					type="text" 
+					id="studentName" 
+					name="studentName" 
+					required
+					autofocus>
+			</div>
+
+			<div class="form-row">
+				<label for="destination">Destination</label>
+				<select 
+					id="destination" 
+					name="destination"
+					onchange="toggleOtherField()"
+					required>
+
+					<option value="">-- Select Destination --</option>
+					<option value="Bathroom">Bathroom</option>
+					<option value="Nurse">Nurse</option>
+					<option value="Front Office">Front Office</option>
+					<option value="Student Services">Student Services</option>
+					<option value="Academic Counselor">Academic Counselor</option>
+					<option value="Other">Other</option>
+
+				</select>
+			</div>
+
+			<div class="form-row">
+				<label for="otherDestination">Other</label>
+				<input 
+					type="text"
+					id="otherDestination"
+					name="otherDestination"
+					disabled>
+			</div>
+
+			<div class="submit-row">
+				<button type="submit">
+					Create Pass
+				</button>
+			</div>
+
+		</form>
+		
+		<br />
+		<br />
+		
+		<div id="myPassTable">
+			{% with passes=dataSet, show_delete=true, show_teacher=false %}
+				{% include "pass_table.html" %}
+			{% endwith %}
+		</div>
+		
+		<br />
+		<br />
+		
+		<div id="allPassTable">
+			{% with passes=fullSet, show_delete=false, show_teacher=true %}
+				{% include "pass_table.html" %}
+			{% endwith %}
 		</div>
 
-		<div class="form-row">
-			<label for="destination">Destination</label>
-			<select 
-				id="destination" 
-				name="destination"
-				onchange="toggleOtherField()"
-				required>
 
-				<option value="">-- Select Destination --</option>
-				<option value="Bathroom">Bathroom</option>
-				<option value="Nurse">Nurse</option>
-				<option value="Front Office">Front Office</option>
-				<option value="Student Services">Student Services</option>
-				<option value="Academic Counselor">Academic Counselor</option>
-				<option value="Other">Other</option>
+		<script>
+		function toggleOtherField() {
 
-			</select>
-		</div>
+			const destination = document.getElementById("destination");
+			const otherField = document.getElementById("otherDestination");
 
-		<div class="form-row">
-			<label for="otherDestination">Other</label>
-			<input 
-				type="text"
-				id="otherDestination"
-				name="otherDestination"
-				disabled>
-		</div>
+			if (destination.value === "Other") {
+				otherField.disabled = false;
+				otherField.required = true;
+			}
+			else {
+				otherField.disabled = true;
+				otherField.required = false;
+				otherField.value = "";
+			}
+		}
+		</script>
 
-		<div class="submit-row">
-			<button type="submit">
-				Create Pass
-			</button>
-		</div>
-
-	</form>
-	
-	<br />
-	<br />
-	
-	<table>
-
-		<thead>
-		<tr>
-			<th>Student</th>
-			<th>Destination</th>
-			<th>Date</th>
-			<th></th>
-		</tr>
-		</thead>
-		<tbody>
-
-		{% for record in dataSet %}
-
-			<tr data-created="{{ record.CreateDate.isoformat() }}"
-			class="
-			{% set age = (now - record.CreateDate).total_seconds() %}
-			{% if age >= 720 %}
-				expired-red
-			{% elif age >= 420 %}
-				expired-yellow
-			{% endif %}
-			">
-				<td>{{ record.StudentName }}</td>
-				<td>{{ record.Destination }}</td>
-				<td>{{ record.CreateDate.strftime("%m/%d/%Y %I:%M %p") }}</td>
-				<td>
-					<form method="POST" action="{{ url_for('delete', id=record.id, next='home') }}">
-						<input type="hidden" name="id" value="{{ record['id'] }}">
-
-						<button type="submit" class="deleteButton" onclick="return confirm('Delete this pass?');">
-							🗑️
-						</button>
-					</form>
-				</td>
-			</tr>
-
-		{% endfor %}
-
-		</tbody>
-	</table>
-	
-	<br />
-	<br />
-	
-	<table>
-
-		<thead>
-		<tr>
-			<th>Teacher</th>
-			<th>Student</th>
-			<th>Destination</th>
-			<th>Date</th>
-		</tr>
-		</thead>
-		<tbody>
-
-		{% for record in fullSet %}
-
-			<tr data-created="{{ record.CreateDate.isoformat() }}"
-			class="
-			{% set age = (now - record.CreateDate).total_seconds() %}
-			{% if age >= 720 %}
-				expired-red
-			{% elif age >= 420 %}
-				expired-yellow
-			{% endif %}
-			">
-				<td>{{ record.TeacherName }}</td>
-				<td>{{ record.StudentName }}</td>
-				<td>{{ record.Destination }}</td>
-				<td>{{ record.CreateDate.strftime("%m/%d/%Y %I:%M %p") }}</td>
-			</tr>
-
-		{% endfor %}
-
-		</tbody>
-	</table>
-
-
+	</body>
 	<script>
-	function toggleOtherField() {
+		function updateRowColors() {
+			const rows = document.querySelectorAll("tbody tr");
 
-		const destination = document.getElementById("destination");
-		const otherField = document.getElementById("otherDestination");
+			rows.forEach(row => {
+				const created = new Date(row.dataset.created);
+				const now = new Date();
 
-		if (destination.value === "Other") {
-			otherField.disabled = false;
-			otherField.required = true;
+				const ageMinutes = (now - created) / 60000;
+
+				row.classList.remove("expired-yellow", "expired-red");
+
+				if (ageMinutes >= 12) {
+					row.classList.add("expired-red");
+				}
+				else if (ageMinutes >= 7) {
+					row.classList.add("expired-yellow");
+				}
+			});
 		}
-		else {
-			otherField.disabled = true;
-			otherField.required = false;
-			otherField.value = "";
+
+
+		function refreshTables() {
+
+			fetch("/get_my_passes")
+				.then(response => response.text())
+				.then(data => {
+					document.getElementById("myPassTable").innerHTML = data;
+					updateRowColors();
+				});
+
+			fetch("/get_all_passes/false")
+				.then(response => response.text())
+				.then(data => {
+					document.getElementById("allPassTable").innerHTML = data;
+					updateRowColors();
+				});
 		}
-	}
+
+
+		// Run once when page loads
+		updateRowColors();
+
+		// Refresh every 15 seconds
+		setInterval(refreshTables, 5000);
 	</script>
-
-</body>
-<script>
-	function updateRowColors() {
-		const rows = document.querySelectorAll("tbody tr");
-
-		rows.forEach(row => {
-			const created = new Date(row.dataset.created);
-			const now = new Date();
-
-			const ageMinutes = (now - created) / 60000;
-
-			row.classList.remove("expired-yellow", "expired-red");
-
-			if (ageMinutes >= 12) {
-				row.classList.add("expired-red");
-			}
-			else if (ageMinutes >= 7) {
-				row.classList.add("expired-yellow");
-			}
-		});
-	}
-
-	updateRowColors();
-	setInterval(updateRowColors, 30000); // Update every 30 seconds
-</script>
 </html>

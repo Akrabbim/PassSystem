@@ -102,6 +102,27 @@ def logout():
     session.pop("user", None)
     return redirect(url_for("home"))
 
+@app.route("/get_my_passes")
+def get_my_passes():
+    dataSet = GetMyRecords()
+    return render_template(
+        "pass_table.html",
+        passes=dataSet,
+        show_delete=True,
+        show_teacher=False
+    )
+
+@app.route("/get_all_passes/<show_delete>")
+def get_all_passes(show_delete):
+    fullSet = GetRecords()
+
+    return render_template(
+        "pass_table.html",
+        passes=fullSet,
+        show_delete=(show_delete == "true"),
+        show_teacher=True
+    )
+
 @app.route("/add_pass", methods=["POST"])
 def add_pass():
 
@@ -132,7 +153,7 @@ def monitor():
     return render_template(
         "monitor.html", 
         title="Welcome", username=session["user"]["name"],
-        dataSet=GetRecords(),
+        fullSet=GetRecords(),
         now=datetime.now()
     )
 

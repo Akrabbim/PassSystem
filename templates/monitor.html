@@ -1,92 +1,70 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>SciHigh Pass Monitor</title>
+	<head>
+		<title>SciHigh Pass Monitor</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-		  
-</head>
+		<link rel="stylesheet"
+			  href="{{ url_for('static', filename='style.css') }}">
+			  
+	</head>
 
-<body>
-	
-	<br />
-	<br />
-	<div class="user-menu">
-		<span class="username">{{ username }}</span>
-		<a href="{{ url_for('logout') }}" class="logout-button">
-			<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-			Logout
-		</a>
-	</div>
-	
-	<table>
+	<body>
+		
+		<br />
+		<br />
+		<div class="user-menu">
+			<span class="username">{{ username }}</span>
+			<a href="{{ url_for('logout') }}" class="logout-button">
+				<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+				Logout
+			</a>
+		</div>
+		
+		<div id="allPassTable">
+			{% with passes=fullSet, show_delete=true, show_teacher=true %}
+				{% include "pass_table.html" %}
+			{% endwith %}
+		</div>
 
-		<thead>
-		<tr>
-			<th>Teacher</th>
-			<th>Student</th>
-			<th>Destination</th>
-			<th>Date</th>
-			<th></th>
-		</tr>
-		</thead>
-		<tbody>
 
-		{% for record in dataSet %}
+	</body>
+	<script>
+		function updateRowColors() {
+			const rows = document.querySelectorAll("tbody tr");
 
-			<tr data-created="{{ record.CreateDate.isoformat() }}"
-			class="
-			{% set age = (now - record.CreateDate).total_seconds() %}
-			{% if age >= 720 %}
-				expired-red
-			{% elif age >= 420 %}
-				expired-yellow
-			{% endif %}
-			">
-				<td>{{ record.TeacherName }}</td>
-				<td>{{ record.StudentName }}</td>
-				<td>{{ record.Destination }}</td>
-				<td>{{ record.CreateDate.strftime("%m/%d/%Y %I:%M %p") }}</td>
-				<td>
-					<form method="POST" action="{{ url_for('delete', id=record.id, next='monitor') }}">
-						<input type="hidden" name="id" value="{{ record['id'] }}">
+			rows.forEach(row => {
+				const created = new Date(row.dataset.created);
+				const now = new Date();
 
-						<button type="submit" class="deleteButton" onclick="return confirm('Delete this pass?');">
-							🗑️
-						</button>
-					</form>
-				</td>
-			</tr>
+				const ageMinutes = (now - created) / 60000;
 
-		{% endfor %}
+				row.classList.remove("expired-yellow", "expired-red");
 
-		</tbody>
-	</table>
+				if (ageMinutes >= 12) {
+					row.classList.add("expired-red");
+				}
+				else if (ageMinutes >= 7) {
+					row.classList.add("expired-yellow");
+				}
+			});
+		}
 
-</body>
-<script>
-	function updateRowColors() {
-		const rows = document.querySelectorAll("tbody tr");
 
-		rows.forEach(row => {
-			const created = new Date(row.dataset.created);
-			const now = new Date();
+		function refreshTables() {
 
-			const ageMinutes = (now - created) / 60000;
+			fetch("/get_all_passes/true")
+				.then(response => response.text())
+				.then(data => {
+					document.getElementById("allPassTable").innerHTML = data;
+					updateRowColors();
+				});
+		}
 
-			row.classList.remove("expired-yellow", "expired-red");
 
-			if (ageMinutes >= 12) {
-				row.classList.add("expired-red");
-			}
-			else if (ageMinutes >= 7) {
-				row.classList.add("expired-yellow");
-			}
-		});
-	}
+		// Run once when page loads
+		updateRowColors();
 
-	updateRowColors();
-	setInterval(updateRowColors, 30000); // Update every 30 seconds
-</script>
+		// Refresh every 15 seconds
+		setInterval(refreshTables, 5000);
+	</script>
 </html>
