@@ -4,6 +4,7 @@ from datetime import date, datetime
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
+from functools import wraps
 import os
 
 load_dotenv()
@@ -50,6 +51,29 @@ def execute_query(query, params=None):
     finally:
         cursor.close()
 
+def IsAuthorized(email):
+    result = execute_query("SELECT IsAuthorized(%s) AS authorized", (email,))
+
+    if not result:
+        return False
+    
+    return result[0]["authorized"]
+
+def authorized_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if "user" not in session:
+            return redirect(url_for("login"))
+
+        email = session["user"]["email"]
+
+        if not IsAuthorized(email):
+            return render_template("unauthorized.html")
+
+        return f(*args, **kwargs)
+
+    return decorated
+
 def GetRecords():
     return execute_query("SELECT * FROM GetAllPasses()")
 
@@ -71,6 +95,7 @@ def DeletePass(passID):
     )
 
 @app.route("/")
+@authorized_required
 def home():
     if "user" not in session:
         return redirect(url_for("login"))
@@ -147,6 +172,7 @@ def delete(id):
     return redirect(url_for(next_page))
 
 @app.route("/monitor")
+@authorized_required
 def monitor():
     if "user" not in session:
         return redirect(url_for("login"))

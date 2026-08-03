@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Unauthorized</title>
+	<link rel="stylesheet"
+		href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+	<div class="user-menu">
+		<span class="username">{{ username }}</span>
+		<a href="{{ url_for('logout') }}" class="logout-button">
+			<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+			Logout
+		</a>
+	</div>
+    <h2>You are not authorized to view this page.</h2>
+
+    <p>
+        Contact
+        <a href="mailto:posborn@noscihigh.org">
+            posborn@noscihigh.org
+        </a>
+        to request access.
+    </p>
+</body>
+</html>
