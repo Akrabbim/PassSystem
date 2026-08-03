@@ -118,10 +118,10 @@
 
 				row.classList.remove("expired-yellow", "expired-red");
 
-				if (ageMinutes >= 12) {
+				if (ageMinutes >= 10) {
 					row.classList.add("expired-red");
 				}
-				else if (ageMinutes >= 7) {
+				else if (ageMinutes >= 5) {
 					row.classList.add("expired-yellow");
 				}
 			});
@@ -130,26 +130,28 @@
 
 		function refreshTables() {
 
-			fetch("/get_my_passes")
-				.then(response => response.text())
-				.then(data => {
-					document.getElementById("myPassTable").innerHTML = data;
-					updateRowColors();
-				});
-
-			fetch("/get_all_passes/false")
-				.then(response => response.text())
-				.then(data => {
-					document.getElementById("allPassTable").innerHTML = data;
-					updateRowColors();
-				});
+			Promise.all([
+				fetch("/get_my_passes").then(response => response.text()),
+				fetch("/get_all_passes/false").then(response => response.text())
+			])
+			.then(([myData, allData]) => {
+				document.getElementById("myPassTable").innerHTML = myData;
+				document.getElementById("allPassTable").innerHTML = allData;
+				updateRowColors();
+			})
+			.catch(error => {
+				console.error("Error refreshing passes:", error);
+			});
 		}
 
 
 		// Run once when page loads
 		updateRowColors();
+		
+		// Refresh colors every 5 seconds
+		setInterval(updateRowColors, 5000);
 
-		// Refresh every 15 seconds
-		setInterval(refreshTables, 5000);
+		// Refresh every 30 seconds
+		setInterval(refreshTables, 30000);
 	</script>
 </html>
