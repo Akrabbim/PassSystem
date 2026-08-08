@@ -131,8 +131,8 @@
 		function refreshTables() {
 
 			Promise.all([
-				fetch("/get_my_passes").then(response => response.text()),
-				fetch("/get_all_passes/false").then(response => response.text())
+				fetch("/get_my_passes?next=home").then(response => response.text()),
+				fetch("/get_all_passes/false?next=home").then(response => response.text())
 			])
 			.then(([myData, allData]) => {
 				document.getElementById("myPassTable").innerHTML = myData;

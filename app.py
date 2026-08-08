@@ -105,7 +105,8 @@ def home():
         username=session["user"]["name"],
         dataSet=GetMyRecords(),
         fullSet=GetRecords(),
-        now=datetime.now()
+        now=datetime.now(),
+        next_page="home"
     )
 
 @app.route("/login")
@@ -130,22 +131,29 @@ def logout():
 @app.route("/get_my_passes")
 def get_my_passes():
     dataSet = GetMyRecords()
+
+    next_page = request.args.get("next", "home")
+
     return render_template(
         "pass_table.html",
         passes=dataSet,
         show_delete=True,
-        show_teacher=False
+        show_teacher=False,
+        next_page=next_page
     )
 
 @app.route("/get_all_passes/<show_delete>")
 def get_all_passes(show_delete):
     fullSet = GetRecords()
 
+    next_page = request.args.get("next", "home")
+
     return render_template(
         "pass_table.html",
         passes=fullSet,
         show_delete=(show_delete == "true"),
-        show_teacher=True
+        show_teacher=True,
+        next_page=next_page
     )
 
 @app.route("/add_pass", methods=["POST"])
@@ -166,7 +174,7 @@ def add_pass():
   
 @app.route("/delete/<int:id>", methods=["POST"])
 def delete(id):
-    DeletePass(id)      # your database function
+    DeletePass(id)
 
     next_page = request.args.get("next", "home")
     return redirect(url_for(next_page))
@@ -180,7 +188,8 @@ def monitor():
         "monitor.html", 
         title="Welcome", username=session["user"]["name"],
         fullSet=GetRecords(),
-        now=datetime.now()
+        now=datetime.now(),
+        next_page="monitor"
     )
 
 if __name__ == "__main__":

@@ -52,7 +52,7 @@
 
 		function refreshTables() {
 
-			fetch("/get_all_passes/true")
+			fetch("/get_all_passes/true?next=monitor")
 				.then(response => response.text())
 				.then(data => {
 					document.getElementById("allPassTable").innerHTML = data;
