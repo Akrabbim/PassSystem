@@ -88,10 +88,11 @@ def InsertPass(teacherName, studentName, destination, googleID):
         (teacherName, studentName, destination, googleID)
     )
 
-def DeletePass(passID):
+def DeletePass(passID, deletedBy):
     execute_query(
-        "SELECT ArchivePass(%s)",
-        (passID,)
+        "SELECT ArchivePass(%s, %s)",
+        (passID,
+         deletedBy)
     )
 
 @app.route("/")
@@ -174,7 +175,8 @@ def add_pass():
   
 @app.route("/delete/<int:id>", methods=["POST"])
 def delete(id):
-    DeletePass(id)
+    deletedBy = session["user"]["email"]
+    DeletePass(id, deletedBy)
 
     next_page = request.args.get("next", "home")
     return redirect(url_for(next_page))
