@@ -20,6 +20,17 @@
 			</a>
 		</div>
 		
+		{% if eyesOnSet %}
+			<div id="eyesOnTable">
+				{% with passes=eyesOnSet %}
+					{% include "eyeson.html" %}
+				{% endwith %}
+			</div>
+			<br />
+			<br />
+
+		{% endif %}
+		
 		<div id="allPassTable">
 			{% with passes=fullSet, show_delete=true, show_teacher=true %}
 				{% include "pass_table.html" %}

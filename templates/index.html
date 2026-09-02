@@ -47,6 +47,7 @@
 					<option value="Return to Class">Return to Class</option>
 					<option value="Student Services">Student Services</option>
 					<option value="Academic Counselor">Academic Counselor</option>
+					<option value="EyesOn">Eyes On</option>
 					<option value="Other">Other</option>
 
 				</select>
@@ -72,6 +73,16 @@
 		<br />
 		<br />
 		
+		{% if eyesOnSet %}
+			<div id="eyesOnTable">
+				{% with passes=eyesOnSet %}
+					{% include "eyeson.html" %}
+				{% endwith %}
+			</div>
+			<br />
+			<br />
+		{% endif %}
+		
 		<div id="myPassTable">
 			{% with passes=dataSet, show_delete=true, show_teacher=false %}
 				{% include "pass_table.html" %}
@@ -82,7 +93,7 @@
 		<br />
 		
 		<div id="allPassTable">
-			{% with passes=fullSet, show_delete=false, show_teacher=true %}
+			{% with passes=fullSet, show_delete=true, show_teacher=true %}
 				{% include "pass_table.html" %}
 			{% endwith %}
 		</div>

@@ -59,6 +59,27 @@ tr:hover{
     background-color: #ff9d9d;
 }
 
+.attention-table {
+    font-size: 1.25rem;
+    font-weight: 600;
+    background-color: #d9f0ff;
+    border: 3px solid #0088cc;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(0, 136, 204, 0.5);
+}
+
+.attention-table th {
+    background-color: #0088cc;
+    color: white;
+    font-size: 1.35rem;
+    font-weight: 700;
+    padding: 10px;
+}
+
+.attention-table td {
+    padding: 10px;
+}
+
 .user-menu {
     position: absolute;
     top: 15px;

@@ -1,0 +1,19 @@
+<table class="attention-table">
+    <thead>
+        <tr>
+			<th>Teacher</th>
+            <th>Student</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for pass in passes %}
+        <tr>
+			<td>{{ pass.TeacherName }}</td>
+            <td>{{ pass.StudentName }}</td>
+			<td>{{ pass.CreateDate.strftime("%m/%d/%Y %I:%M %p") }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

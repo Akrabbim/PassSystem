@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, session, request
 from authlib.integrations.flask_client import OAuth
 from datetime import date, datetime
-import psycopg2
+from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 from functools import wraps
@@ -12,7 +12,9 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
-db = psycopg2.connect(
+db_pool = pool.ThreadedConnectionPool(
+    minconn=2,
+    maxconn=10,
     host=os.getenv("SUPABASE_HOST"),
     database=os.getenv("SUPABASE_DATABASE"),
     user=os.getenv("SUPABASE_USER"),
@@ -32,24 +34,31 @@ google = oauth.register(
 )
 
 def execute_query(query, params=None):
-    cursor = db.cursor(cursor_factory=RealDictCursor)
+    db = db_pool.getconn()
+
     try:
-        cursor.execute(query, params)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
-        if cursor.description:
-            result = cursor.fetchall()
-        else:
-            result = None
+        try:
+            cursor.execute(query, params)
 
-        db.commit()
-        return result
+            if cursor.description:
+                result = cursor.fetchall()
+            else:
+                result = None
 
-    except Exception:
-        db.rollback()
-        raise
+            db.commit()
+            return result
+
+        except Exception:
+            db.rollback()
+            raise
+
+        finally:
+            cursor.close()
 
     finally:
-        cursor.close()
+        db_pool.putconn(db)
 
 def IsAuthorized(email):
     result = execute_query("SELECT IsAuthorized(%s) AS authorized", (email,))
@@ -82,6 +91,9 @@ def GetMyRecords():
 
     return execute_query("SELECT * FROM GetTeacherPasses(%s)", (teacherID,))
 
+def GetEyesOnRecords():
+    return execute_query("SELECT * FROM GetEyesOnPasses()")
+
 def InsertPass(teacherName, studentName, destination, googleID):
     execute_query(
         "SELECT AddPass(%s, %s, %s, %s)",
@@ -104,6 +116,7 @@ def home():
         "index.html", 
         title="Welcome", 
         username=session["user"]["name"],
+        eyesOnSet=GetEyesOnRecords(),
         dataSet=GetMyRecords(),
         fullSet=GetRecords(),
         now=datetime.now(),
@@ -189,6 +202,7 @@ def monitor():
     return render_template(
         "monitor.html", 
         title="Welcome", username=session["user"]["name"],
+        eyesOnSet=GetEyesOnRecords(),
         fullSet=GetRecords(),
         now=datetime.now(),
         next_page="monitor"
