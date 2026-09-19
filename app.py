@@ -165,7 +165,7 @@ def get_all_passes(show_delete):
     return render_template(
         "pass_table.html",
         passes=fullSet,
-        show_delete=(show_delete == "true"),
+        show_delete=True,
         show_teacher=True,
         next_page=next_page
     )
