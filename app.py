@@ -170,6 +170,15 @@ def get_all_passes(show_delete):
         next_page=next_page
     )
 
+@app.route("/get_eyes_on")
+def get_eyes_on():
+    eyesOnSet = GetEyesOnRecords()
+
+    return render_template(
+        "eyeson.html",
+        passes=eyesOnSet
+    )
+
 @app.route("/add_pass", methods=["POST"])
 def add_pass():
 

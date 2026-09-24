@@ -47,7 +47,7 @@
 					<option value="Front Office">Front Office</option>
 					<option value="Student Services">Student Services</option>
 					<option value="Academic Counselor">Academic Counselor</option>
-					<option value="ELL Language Lab">ELL Language Lab</option>
+					<option value="ELL Learning Lab">ELL Learning Lab</option>
 					<option value="EyesOn">Eyes On</option>
 					<option value="Other">Other</option>
 
@@ -74,15 +74,16 @@
 		<br />
 		<br />
 		
-		{% if eyesOnSet %}
-			<div id="eyesOnTable">
+		<div id="eyesOnTable">
+			{% if eyesOnSet %}
 				{% with passes=eyesOnSet %}
 					{% include "eyeson.html" %}
 				{% endwith %}
-			</div>
-			<br />
-			<br />
-		{% endif %}
+			{% endif %}
+		</div>
+		
+		<br />
+		<br />
 		
 		<div id="myPassTable">
 			{% with passes=dataSet, show_delete=true, show_teacher=false %}
@@ -145,11 +146,13 @@
 
 			Promise.all([
 				fetch("/get_my_passes?next=home").then(response => response.text()),
-				fetch("/get_all_passes/false?next=home").then(response => response.text())
+				fetch("/get_all_passes/false?next=home").then(response => response.text()),
+				fetch("/get_eyes_on?next=home").then(response => response.text())
 			])
-			.then(([myData, allData]) => {
+			.then(([myData, allData, eyesOnData]) => {
 				document.getElementById("myPassTable").innerHTML = myData;
 				document.getElementById("allPassTable").innerHTML = allData;
+				document.getElementById("eyesOnTable").innerHTML = eyesOnData;
 				updateRowColors();
 			})
 			.catch(error => {
